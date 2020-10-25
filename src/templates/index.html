@@ -1,0 +1,12 @@
+<html>
+   <head>
+      <script type = "text/javascript"
+         src = "{{ url_for('static', filename = 'js/sometext.js') }}" ></script>
+   </head>
+
+   <body>
+      <h2>Simple Flask Site</h2>
+      <p>When the button below is clicked, some sample text will be displayed.</p>
+      <input name = "btn" type = "button" onclick = "displaySomeText()" value = "Display some text!" />
+   </body>
+</html>
