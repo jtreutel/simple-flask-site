@@ -21,7 +21,7 @@ jobs:
           name: Install Chrome 86 and Chromedriver 86
       - run:
           command: | 
-            sudo nohup python src/site.py > site.log 2>&1 &
+            nohup python src/site.py > site.log 2>&1 &
             python -m pytest
           name: Test website
 
