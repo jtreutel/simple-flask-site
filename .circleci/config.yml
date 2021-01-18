@@ -7,10 +7,6 @@ orbs: #2.1 only
 
 jobs:
   build-and-test:
-    branches:
-      only:
-        - master
-        - server2x
     executor: python/default   #2.1 only
     steps:
       - checkout
