@@ -8,7 +8,8 @@ orbs:
 jobs:
   build-and-test:
     branches:
-      
+      - master
+      - server2x
     executor: python/default
     steps:
       - checkout
@@ -32,9 +33,6 @@ jobs:
 workflows:
   version: 2
   main:
-    jobs:
-      - build-and-test
-  server2x:
     jobs:
       - build-and-test
       #- aws-ecr/build-and-push-image:
