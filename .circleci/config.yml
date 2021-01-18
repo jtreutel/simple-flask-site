@@ -7,27 +7,31 @@ orbs: #2.1 only
 
 jobs:
   build-and-test:
-    #executor: python/default   #2.1 only
+    context: server2x-testing
     docker:
-      image: circleci/python:3.9.0
+      - image: circleci/python:3.9.0
+        auth:
+          username: jtreutel
+          password: $DOCKERHUB_PW
     steps:
       - checkout
-      - python/load-cache
-      - python/install-deps
-      - python/save-cache
       - run: 
+          name: Installing requirements
+          command: |
+            pip3 install -r requirements.txt
+      - run: 
+          name: Install Chrome 86 and Chromedriver 86
           command: |
             wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
             sudo apt install ./google-chrome-stable_current_amd64.deb
             wget https://chromedriver.storage.googleapis.com/86.0.4240.22/chromedriver_linux64.zip
             unzip ./chromedriver_linux64.zip
             sudo mv chromedriver /usr/local/bin/
-          name: Install Chrome 86 and Chromedriver 86
       - run:
+          name: Test website
           command: | 
             nohup python src/site.py > site.log 2>&1 &
             python -m pytest
-          name: Test website
 
 workflows:
   version: 2
