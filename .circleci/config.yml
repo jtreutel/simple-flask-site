@@ -8,8 +8,9 @@ orbs:
 jobs:
   build-and-test:
     branches:
-      - master
-      - server2x
+      only:
+        - master
+        - server2x
     executor: python/default
     steps:
       - checkout
