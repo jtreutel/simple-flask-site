@@ -1,10 +1,5 @@
 version: 2.0
 
-orbs: #2.1 only
-  python: circleci/python@0.2.1
-  aws-ecr: circleci/aws-ecr@6.13.0
-  aws-ecs: circleci/aws-ecs@1.3.0
-
 jobs:
   build-and-test:
     context: server2x-testing
@@ -32,12 +27,29 @@ jobs:
           command: | 
             nohup python src/site.py > site.log 2>&1 &
             python -m pytest
+  build-image-and-push:
+    context: server2x-testing
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 19.03.13
+      - run:
+        name: Build and push Docker image to ECR
+        command: |
+          docker build -f Dockerfile -t simpleflasksite:$CIRCLE_BUILD_NUM . 
+          AWS_ACCT_NO=$(aws sts get-caller-identity --region $AWS_REGION | jq -r '.Account')
+          docker login -u AWS -p $(aws ecr get-login-password --region $AWS_REGION) $AWS_ACCT_NO.dkr.ecr.$AWS_REGION.amazonaws.com
+          docker push "$AWS_ACCT_NO.dkr.ecr.$AWS_REGION.amazonaws.com/simpleflasksite:$CIRCLE_BUILD_NUM"
+        
 
 workflows:
   version: 2
   main:
     jobs:
       - build-and-test
+      - build-image-and-push
       #- aws-ecr/build-and-push-image:
       #    repo: "${AWS_RESOURCE_NAME_PREFIX}"
       #    tag: "${CIRCLE_SHA1}"
