@@ -37,6 +37,9 @@ jobs:
       - run:
           name: Build and push Docker image to ECR
           command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
             docker build -f Dockerfile -t simpleflasksite:$CIRCLE_BUILD_NUM . 
             AWS_ACCT_NO=$(aws sts get-caller-identity --region $AWS_REGION | jq -r '.Account')
             docker login -u AWS -p $(aws ecr get-login-password --region $AWS_REGION) $AWS_ACCT_NO.dkr.ecr.$AWS_REGION.amazonaws.com
