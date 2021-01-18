@@ -43,7 +43,7 @@ jobs:
             docker build -f Dockerfile -t simpleflasksite:$CIRCLE_BUILD_NUM . 
             AWS_ACCT_NO=$(aws sts get-caller-identity --region ap-northeast-1 | jq -r '.Account')
             docker login -u AWS -p $(aws ecr get-login-password --region ap-northeast-1) $AWS_ACCT_NO.dkr.ecr.ap-northeast-1.amazonaws.com
-            docker push "$AWS_ACCT_NO.dkr.ecr.ap-northeast-1.amazonaws.com/simpleflasksite:$CIRCLE_BUILD_NUM"
+            docker push "simpleflasksite:$CIRCLE_BUILD_NUM"
           
 
 workflows:
