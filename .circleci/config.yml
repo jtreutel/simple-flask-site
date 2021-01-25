@@ -47,20 +47,19 @@ jobs:
           command: | 
             nohup python src/site.py > site.log 2>&1 &
             python -m pytest
-  manual-approval:
-    type: approval
 
 workflows:
   main:
     jobs:
       - checkout-code
-      - static-analysis
+      - static-analysis:
           requires:
             - checkout-code
-      - run-tests
+      - run-tests:
           requires:
             - checkout-code
-      - manual-approval
+      - manual-approval:
+          type: approval
           requires:
             - static-analysis
             - run-tests
