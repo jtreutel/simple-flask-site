@@ -10,18 +10,18 @@ jobs:
     executor: python/default
     steps:
       - checkout
-      - python/install-packages
       - save_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - ~/project #default working dir
-            - /home/circleci/.local/lib/python3.9/site-packages
   static-analysis:
     executor: python/default
     steps:
       - restore_cache:
           keys:
             - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - python/install-packages:
+          args: flask pytest pytest-flask pylint 
       - run: |
           cd ./src
           pylint ./site.py
@@ -31,6 +31,8 @@ jobs:
       - restore_cache:
           keys:
             - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - python/install-packages:
+          args: flask pytest pytest-flask selenium chromedriver 
       - run: 
           name: Install Chrome 86 and Chromedriver 86
           command: |
