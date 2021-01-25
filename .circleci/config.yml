@@ -10,7 +10,7 @@ jobs:
     executor: python/default
     steps:
       - checkout
-      - python\install-packages
+      - python/install-packages
       - save_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
           paths:
