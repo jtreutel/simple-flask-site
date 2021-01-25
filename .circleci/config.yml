@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  python: circleci/python@0.2.1
+  python: circleci/python@1.3.2
   aws-ecr: circleci/aws-ecr@6.13.0
   aws-ecs: circleci/aws-ecs@1.3.0
 
@@ -10,20 +10,18 @@ jobs:
     executor: python/default
     steps:
       - checkout
-      - python/load-cache
-      - python/install-deps
-      - python/save-cache
+      - python/install-packages
       - save_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - ~/project #default working dir
+            - /home/circleci/.local/lib/python3.9/site-packages
   static-analysis:
     executor: python/default
     steps:
       - restore_cache:
           keys:
             - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
-      - python/load-cache
       - run: |
           cd ./src
           pylint ./site.py
@@ -33,13 +31,12 @@ jobs:
       - restore_cache:
           keys:
             - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
-      - python/load-cache
       - run: 
           name: Install Chrome 86 and Chromedriver 86
           command: |
             wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
             sudo apt install ./google-chrome-stable_current_amd64.deb
-            wget https://chromedriver.storage.googleapis.com/86.0.4240.22/chromedriver_linux64.zip
+            wget https://chromedriver.storage.googleapis.com/88.0.4324.96/chromedriver_linux64.zip
             unzip ./chromedriver_linux64.zip
             sudo mv chromedriver /usr/local/bin/
       - run:
