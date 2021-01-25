@@ -11,6 +11,7 @@ jobs:
     steps:
       - checkout
       - python/install-packages
+          cache-version: v3
       - save_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
           paths:
@@ -22,6 +23,7 @@ jobs:
           keys:
             - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
       - python/install-packages
+          cache-version: v3      
       - run: |
           cd ./src
           pylint ./site.py
