@@ -6,34 +6,69 @@ orbs:
   aws-ecs: circleci/aws-ecs@1.3.0
 
 jobs:
-  build-and-test:
+  checkout-code:
     executor: python/default
     steps:
       - checkout
       - python/load-cache
       - python/install-deps
       - python/save-cache
+      - save_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/project #default working dir
+  static-analysis:
+    executor: python/default
+    steps:
+      - python/load-cache
+      - restore_cache:
+          keys:
+            - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - run: |
+          cd ./src
+          pylint ./site.py
+  run-tests:
+    executor: python/default
+    steps:
+      - python/load-cache
+      - restore_cache:
+          keys:
+            - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
       - run: 
+          name: Install Chrome 86 and Chromedriver 86
           command: |
             wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
             sudo apt install ./google-chrome-stable_current_amd64.deb
             wget https://chromedriver.storage.googleapis.com/86.0.4240.22/chromedriver_linux64.zip
             unzip ./chromedriver_linux64.zip
             sudo mv chromedriver /usr/local/bin/
-          name: Install Chrome 86 and Chromedriver 86
       - run:
+          name: Test website functionality
           command: | 
             nohup python src/site.py > site.log 2>&1 &
             python -m pytest
-          name: Test website
+  manual-approval:
+    type: approval
 
 workflows:
   main:
     jobs:
-      - build-and-test
+      - checkout-code
+      - static-analysis
+          requires:
+            - checkout-code
+      - run-tests
+          requires:
+            - checkout-code
+      - manual-approval
+          requires:
+            - static-analysis
+            - run-tests
       - aws-ecr/build-and-push-image:
           repo: "${AWS_RESOURCE_NAME_PREFIX}"
           tag: "${CIRCLE_SHA1}"
+          requires:
+            - manual-approval
       - aws-ecs/deploy-service-update:
           requires:
             - aws-ecr/build-and-push-image # only run this job once aws-ecr/build-and-push-image has completed
