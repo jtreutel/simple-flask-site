@@ -10,7 +10,7 @@ jobs:
     executor: python/default
     steps:
       - checkout
-      - python/install-packages
+      - python/install-packages:
           cache-version: v3
       - save_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
@@ -22,7 +22,7 @@ jobs:
       - restore_cache:
           keys:
             - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
-      - python/install-packages
+      - python/install-packages:
           cache-version: v3      
       - run: |
           cd ./src
