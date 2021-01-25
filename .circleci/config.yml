@@ -20,20 +20,20 @@ jobs:
   static-analysis:
     executor: python/default
     steps:
-      - python/load-cache
       - restore_cache:
           keys:
             - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - python/load-cache
       - run: |
           cd ./src
           pylint ./site.py
   run-tests:
     executor: python/default
     steps:
-      - python/load-cache
       - restore_cache:
           keys:
             - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - python/load-cache
       - run: 
           name: Install Chrome 86 and Chromedriver 86
           command: |
