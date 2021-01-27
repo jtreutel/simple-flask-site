@@ -8,7 +8,7 @@ orbs:
 jobs:
   checkout-code:
     docker:
-      - image: cimg/python:3.9.1
+      - image: cimg/python:3.9.0
     steps:
       - checkout
       - python/install-packages:
@@ -30,7 +30,7 @@ jobs:
           pylint ./site.py
   run-tests:
     docker:
-      - image: cimg/python:3.9.1
+      - image: cimg/python:3.9.0
     steps:
       - restore_cache:
           keys:
@@ -40,14 +40,17 @@ jobs:
       - run: 
           name: Install Chrome 86 and Chromedriver 86
           command: |
-            wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-            sudo apt install ./google-chrome-stable_current_amd64.deb
+            wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - 
+            sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+            sudo apt-get update
+            sudo apt-get install google-chrome-stable
             wget https://chromedriver.storage.googleapis.com/88.0.4324.96/chromedriver_linux64.zip
             unzip ./chromedriver_linux64.zip
             sudo mv chromedriver /usr/local/bin/
       - run:
           name: Test website functionality
           command: | 
+            pip install python
             nohup python src/site.py > site.log 2>&1 &
             python -m pytest
 
