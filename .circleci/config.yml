@@ -18,7 +18,8 @@ jobs:
           paths:
             - ~/project #default working dir
   static-analysis:
-    executor: python/default
+    docker:
+      - image: cimg/python:3.9.0
     steps:
       - restore_cache:
           keys:
@@ -50,7 +51,6 @@ jobs:
       - run:
           name: Test website functionality
           command: | 
-            pip install python
             nohup python src/site.py > site.log 2>&1 &
             python -m pytest
 
