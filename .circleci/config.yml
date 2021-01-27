@@ -11,8 +11,8 @@ jobs:
       - image: cimg/python:3.9.0
     steps:
       - checkout
-      - python/install-packages:
-          cache-version: v3
+      #- python/install-packages:
+      #    cache-version: v3
       - save_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
           paths:
@@ -24,9 +24,10 @@ jobs:
       - restore_cache:
           keys:
             - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
-      - python/install-packages:
-          cache-version: v3      
+      #- python/install-packages:
+      #    cache-version: v3      
       - run: |
+          pip install flask pytest pytest-flask pylint
           cd ./src
           pylint ./site.py
   run-tests:
@@ -36,8 +37,8 @@ jobs:
       - restore_cache:
           keys:
             - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
-      - python/install-packages:
-          cache-version: v3   
+      #- python/install-packages:
+      #    cache-version: v3   
       - run: 
           name: Install Chrome 86 and Chromedriver 86
           command: |
@@ -51,6 +52,7 @@ jobs:
       - run:
           name: Test website functionality
           command: | 
+            pip install flask pytest pytest-flask selenium chromedriver
             nohup python src/site.py > site.log 2>&1 &
             python -m pytest
 
