@@ -7,7 +7,8 @@ orbs:
 
 jobs:
   checkout-code:
-    executor: python/default
+    docker:
+      - image: cimg/python:3.9.1
     steps:
       - checkout
       - python/install-packages:
@@ -28,11 +29,14 @@ jobs:
           cd ./src
           pylint ./site.py
   run-tests:
-    executor: python/default
+    docker:
+      - image: cimg/python:3.9.1
     steps:
       - restore_cache:
           keys:
             - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - python/install-packages:
+          cache-version: v3   
       - run: 
           name: Install Chrome 86 and Chromedriver 86
           command: |
